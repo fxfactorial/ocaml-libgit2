@@ -1,4 +1,2 @@
-PKG core
+PRJ ctypes
 PKG ctypes.foreign
-
-
