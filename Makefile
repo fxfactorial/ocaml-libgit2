@@ -2,11 +2,10 @@ PACKAGES := ctypes.foreign
 CCLIB := libgit2.0.22.0.dylib
 SRC := git.ml
 
-DEBUG_EXEC := Git_test
 
-.PHONY:clean generate_bindings
+.PHONY:clean git_test
 
-generate_bindings:
+git_test:
 	ocamlfind ocamlopt -package $(PACKAGES) -cclib $(CCLIB) \
 	-thread -linkpkg git.ml -o $@
 	./$@
@@ -16,4 +15,4 @@ debug:
 	-linkpkg $(SRC) -o $(DEBUG_EXEC)
 
 clean:
-	rm -rf *.cmi *.cmt *.cmx *.cmo *.o $(DEBUG_EXEC) generate_bindings
+	rm -rf *.cmi *.cmt *.cmx *.cmo *.o git_test
