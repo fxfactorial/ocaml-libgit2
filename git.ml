@@ -131,6 +131,149 @@ module Types = struct
         (structure "git_tree_entry" : git_tree_entry structure typ)
         "git_tree_entry"
         (* Stopped, please continue *)
+
+    let git_tree =
+      typedef
+        (structure "git_tree" : git_tree structure typ)
+        "git_tree"
+
+    let git_treebuilder =
+      typedef
+        (structure "git_treebuilder" : git_treebuilder structure typ)
+        "git_treebuilder"
+
+    let git_index =
+      typedef
+        (structure "git_index" : git_index structure typ)
+        "git_index"
+
+    let git_index_conflict_iterator =
+      typedef
+        (structure "git_index_conflict_iterator"
+         : git_index_conflict_iterator structure typ)
+        "git_index_conflict_iterator"
+
+    let git_config =
+      typedef
+        (structure "git_config" : git_config structure typ)
+        "git_config"
+
+    let git_config_backend =
+      typedef
+        (structure "git_config_backend" : git_config_backend structure typ)
+        "git_config_backend"
+
+    let git_reflog_entry =
+      typedef
+        (structure "git_reflog_entry" : git_reflog_entry structure typ)
+        "git_reflog_entry"
+
+    let git_reflog =
+      typedef
+        (structure "git_reflog" : git_reflog structure typ)
+        "git_reflog"
+
+    let git_note =
+      typedef
+        (structure "git_note" : git_note structure typ)
+        "git_note"
+
+    let git_packbuilder =
+      typedef
+        (structure "git_packbuilder" : git_packbuilder structure typ)
+        "git_packbuilder"
+
+    let git_time =
+      typedef
+        (structure "git_time" : git_time structure typ)
+        "git_time"
+
+    let git_signature =
+      typedef
+        (structure "git_signature" : git_signature structure typ)
+        "git_signature"
+
+    let git_reference =
+      typedef
+        (structure "git_reference" : git_reference structure typ)
+        "git_reference"
+
+    let git_reference_iterator =
+      typedef
+        (structure "git_reference_iterator" : git_reference_iterator structure typ)
+        "git_reference_iterator"
+
+    let git_transaction =
+      typedef
+        (structure "git_transaction" : git_transaction structure typ)
+        "git_transaction"
+
+    let git_transfer_progress =
+      typedef
+        (structure "git_transfer_progress" : git_transfer_progress structure typ)
+        "git_transfer_progress"
+
+    let git_annotated_commit =
+      typedef
+        (structure "git_annotated_commit" : git_annotated_commit structure typ)
+        "git_annotated_commit"
+
+    let git_merge_result =
+      typedef
+        (structure "git_merge_result" : git_merge_result structure typ)
+        "git_merge_result"
+
+    let git_status_list =
+      typedef
+        (structure "git_status_list" : git_status_list structure typ)
+        "git_status_list"
+
+    let git_rebase =
+      typedef
+        (structure "git_rebase" : git_rebase structure typ)
+        "git_rebase"
+
+    let git_refspec =
+      typedef
+        (structure "git_refspec" : git_refspec structure typ)
+        "git_refspec"
+
+    let git_remote =
+      typedef
+        (structure "git_remote" : git_remote structure typ)
+        "git_remote"
+
+    let git_transport =
+      typedef
+        (structure "git_transport" : git_transport structure typ)
+        "git_transport"
+
+    let git_push =
+      typedef
+        (structure "git_push" : git_push structure typ)
+        "git_push"
+
+    let git_remote_head =
+      typedef
+        (structure "git_remote_head" : git_remote_head structure typ)
+        "git_remote_head"
+
+    let git_remote_callbacks =
+      typedef
+        (structure "git_remote_callbacks" : git_remote_callbacks structure typ)
+        "git_remote_callbacks"
+
+    let git_transfer_progress =
+      typedef
+        (structure "git_transfer_progress" : git_transfer_progress structure typ)
+        "git_transfer_progress"
+
+    let git_transfer_progress_cb =
+      (ptr git_transfer_progress @-> ptr void @-> returning int)
+
+    let git_transport_message_cb =
+      (string @-> int @-> ptr void @-> returning int)
+        
   end
 
 module Oid = struct
@@ -239,6 +382,52 @@ module Oid = struct
 
   end
 
+module Indexer = struct
+
+  end
+module Checkout = struct
+
+  end
+module Remote = struct
+    let git_remote_rename_problem_cb =
+      string @-> ptr void @-> returning int
+
+  end
+module Transport = struct
+
+  end
+module Clone = struct
+    type git_clone_options
+
+    let git_remote_create_cb =
+      (ptr @@ ptr Types.git_remote) @->
+        ptr Types.git_repository @->
+          string @->
+            string @->
+              ptr void @-> returning int
+
+    let git_repository_create_cb =
+      (ptr (ptr Types.git_repository) @-> string @-> int @-> ptr void @-> returning int)
+
+    let git_clone_options =
+      typedef
+        (structure "git_clone_options" : git_clone_options structure typ)
+        "git_clone_options"
+
+    let git_clone_init_options =
+      foreign
+        "git_clone_init_options"
+        (ptr git_clone_options @-> int64_t @-> returning int)
+
+    let git_clone =
+      foreign
+        "git_clone"
+        (ptr (ptr Types.git_repository) @->
+           string @->
+             string @->
+               ptr git_clone_options @-> returning int)
+  end
+
 module Attr = struct
 
     let git_attr_for_each_cb = string @-> string @-> ptr void @-> returning int
@@ -285,11 +474,16 @@ module Attr = struct
         (ptr Types.git_repository @-> string @-> string @-> returning int)
   end
 
-let () =
-  let major = allocate int 0 in
-  let minor = allocate int 0 in
-  let rev = allocate int 0 in
-  Common.git_libgit2_version major minor rev;
-  Printf.sprintf "%d.%d.%d" (!@ major) (!@ minor) (!@ rev) |> print_endline;
-  let features_value = Common.git_libgit2_features () in
-  print_endline (string_of_int features_value)
+(* let () = *)
+(*   let major = allocate int 0 in *)
+(*   let minor = allocate int 0 in *)
+(*   let rev = allocate int 0 in *)
+(*   Common.git_libgit2_version major minor rev; *)
+(*   Printf.sprintf "%d.%d.%d" (!@ major) (!@ minor) (!@ rev) |> print_endline; *)
+(*   let features_value = Common.git_libgit2_features () in *)
+(*   print_endline (string_of_int features_value) *)
+
+(* let () = *)
+(*   let result =  *)
+(*   in *)
+(*   print_endline (string_of_int result) *)
