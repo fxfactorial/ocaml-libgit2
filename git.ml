@@ -135,10 +135,10 @@ module Types = struct
         (structure "git_tag" : git_tag structure typ)
         "git_tag"
 
-    let git_blog =
+    let git_blob =
       typedef
         (structure "git_blob" : git_blob structure typ)
-        "git_blog"
+        "git_blob"
 
     let git_commit =
       typedef
@@ -400,6 +400,7 @@ module Oid = struct
         (ptr git_oid_shorten @-> returning void)
 
   end
+
 module Blame = struct
     type git_blame_options
     type git_blame_hunk
@@ -823,6 +824,92 @@ module Attr = struct
       foreign
         "git_attr_add_macro"
         (ptr Types.git_repository @-> string @-> string @-> returning int)
+  end
+module Blob = struct
+
+    let git_blob_chunk_cb =
+      string @-> size_t @-> ptr void @-> returning int
+
+    let git_blob_lookup =
+      foreign
+        "git_blob_lookup"
+        (ptr (ptr Types.git_blob) @->
+                ptr Types.git_repository @->
+                  ptr Oid.git_oid @-> returning int)
+
+    let git_blob_lookup_prefix =
+      foreign
+        "git_blob_lookup_prefix"
+        (ptr (ptr Types.git_blob) @->
+           ptr Types.git_repository @->
+             ptr Oid.git_oid @->
+               size_t @->
+                 returning int)
+
+    let git_blob_free =
+      foreign
+        "git_blob_free"
+        (ptr Types.git_blob @-> returning void)
+
+    let git_blob_id =
+      foreign
+        "git_blob_id"
+        (ptr Types.git_blob @-> returning (ptr Oid.git_oid))
+
+    let git_blob_owner =
+      foreign
+        "git_blob_owner"
+        (ptr Types.git_blob @-> returning (ptr Types.git_repository))
+
+    let git_blob_rawcontent =
+      foreign
+        "git_blob_rawcontent"
+        (ptr Types.git_blob @-> returning (ptr void))
+
+    let git_blob_rawsize =
+      foreign
+        "git_blob_rawsize"
+        (ptr Types.git_blob @-> returning Types.git_off_t)
+
+    let git_blob_filtered_content =
+      foreign
+        "git_blob_filtered_content"
+        (ptr Buffer.git_buf @->
+           ptr Types.git_blob @->
+             string @->
+               int @-> returning int)
+
+    let git_blob_create_fromworkdir =
+      foreign
+        "git_blob_create_fromworkdir"
+        (ptr Oid.git_oid @-> ptr Types.git_repository @-> string @-> returning int)
+
+    let git_blob_create_fromdisk =
+      foreign
+        "git_blob_create_fromdisk"
+        (ptr Oid.git_oid @-> ptr Types.git_repository @-> string @-> returning int)
+
+    let git_blob_create_fromchunks =
+      foreign
+        "git_blob_create_fromchunks"
+        (ptr Oid.git_oid @->
+           ptr Types.git_repository @->
+             string @->
+               funptr git_blob_chunk_cb @->
+                 ptr void @-> returning int)
+
+    let git_blob_create_frombuffer =
+      foreign
+        "git_blob_create_frombuffer"
+        (ptr Oid.git_oid @->
+           ptr Types.git_repository @->
+             ptr void @->
+               size_t @-> returning int)
+
+    let git_blob_is_binary =
+      foreign
+        "git_blob_is_binary"
+        (ptr Types.git_blob @-> returning int)
   end
 
 (* let () = *)
