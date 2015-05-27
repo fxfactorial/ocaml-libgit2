@@ -2,15 +2,33 @@ open Ctypes
 open Foreign
 
 module Common = struct
+
+    let git_feature_t = typedef int64_t "git_feature_t"
+    let git_libgit_2_opt_t = typedef int64_t "git_libgit2_opt_t"
+
     let git_libgit2_version =
-      foreign "git_libgit2_version" (ptr int @-> ptr int @-> ptr int @-> returning void)
+      foreign
+        "git_libgit2_version"
+        (ptr int @-> ptr int @-> ptr int @-> returning void)
 
     let git_libgit2_features =
-      foreign "git_libgit2_features" (void @-> returning int)
+      foreign
+        "git_libgit2_features"
+        (void @-> returning int)
 
     (* This needs a second varidic argument *)
     let git_libgit2_opts =
-      foreign "git_libgit2_opts" (int @-> returning int)
+      foreign
+        "git_libgit2_opts"
+        (int @-> returning int)
+  end
+
+module Buffer = struct
+    type git_buf
+    let git_buf =
+      typedef
+        (structure "git_buf" : git_buf structure typ)
+        "git_buf"
   end
 
 module Types = struct
@@ -61,6 +79,7 @@ module Types = struct
     let git_branch_t = typedef int64_t "git_branch_t"
     let git_filemode_t = typedef int64_t "git_filemode_t"
     let git_cert_t = typedef int64_t "git_cert_t"
+    let git_otype = typedef int64_t "git_otype"
 
     let git_odb = typedef
                     (structure "git_odb" : git_odb structure typ)
@@ -130,7 +149,7 @@ module Types = struct
       typedef
         (structure "git_tree_entry" : git_tree_entry structure typ)
         "git_tree_entry"
-        (* Stopped, please continue *)
+    (* Stopped, please continue *)
 
     let git_tree =
       typedef
@@ -273,7 +292,7 @@ module Types = struct
 
     let git_transport_message_cb =
       (string @-> int @-> ptr void @-> returning int)
-        
+
   end
 
 module Oid = struct
@@ -396,6 +415,231 @@ module Remote = struct
 module Transport = struct
 
   end
+module Repository = struct
+
+    type git_repository_init_options
+
+    let git_repository_open_flag_t = typedef int64_t "git_repository_open_flag_t"
+    let git_repository_init_flag_t = typedef int64_t "git_repository_init_flag_t"
+    let git_repository_init_mode_t = typedef int64_t "git_repository_init_mode_t"
+    let git_repository_state_t = typedef int64_t "git_repository_state_t"
+
+    let git_repository_fetchhead_foreach_cb =
+      string @-> string @-> string @-> uint @-> ptr void @-> returning int
+
+    let git_repository_mergehead_foreach_cb =
+      string @-> ptr void @-> returning int
+
+    let git_repository_init_options =
+      typedef
+        (structure "git_repository_init_options" :
+           git_repository_init_options structure typ)
+        "git_repository_init_options"
+
+    let git_repository_open =
+      foreign
+        "git_repository_open"
+        (ptr (ptr Types.git_repository) @-> string @-> returning int)
+
+    let git_repository_wrap_odb =
+      foreign
+        "git_repository_wrap_odb"
+        (ptr (ptr Types.git_repository) @-> ptr Types.git_odb @-> returning int)
+
+    let git_repository_discover =
+      foreign
+        "git_repository_discover"
+        (ptr Buffer.git_buf @-> string @-> int @-> string @-> returning int)
+
+    let git_repository_open_ext =
+      foreign
+        "git_repository_open_ext"
+        ((ptr (ptr Types.git_repository)) @->
+           string @-> int @-> string @-> returning int)
+
+    let git_repository_open_bare =
+      foreign
+        "git_repository_open_bare"
+        (ptr (ptr Types.git_repository) @-> string @-> returning int)
+
+    let git_repository_free =
+      foreign
+        "git_repository_free"
+        (ptr Types.git_repository @-> returning void)
+
+    let git_repository_init =
+      foreign
+        "git_repository_init"
+        (ptr (ptr Types.git_repository) @-> string @-> uint @-> returning int)
+
+    let git_repository_init_init_options =
+      foreign
+        "git_repository_init_init_options"
+        (ptr git_repository_init_options @-> uint @-> returning int)
+
+    let git_repository_init_ext =
+      foreign
+        "git_repository_init_ext"
+        (ptr (ptr Types.git_repository) @->
+           string @-> ptr git_repository_init_options @-> returning int)
+
+    let git_repository_head =
+      foreign
+        "git_repository_head"
+        (ptr (ptr Types.git_reference) @-> ptr Types.git_repository @-> returning int)
+
+    let git_repository_head_detached =
+      foreign
+        "git_repository_head"
+        (ptr Types.git_repository @-> returning int)
+
+    let git_repository_head_unborn =
+      foreign
+        "git_repository_head_unborn"
+        (ptr Types.git_repository @-> returning int)
+
+    let git_repository_is_empty =
+      foreign
+        "git_repository_is_empty"
+        (ptr Types.git_repository @-> returning int)
+
+    let git_repository_path =
+      foreign
+        "git_repository_path"
+        (ptr Types.git_repository @-> returning string)
+
+    let git_repository_workdir =
+      foreign
+        "git_repository_workdir"
+        (ptr Types.git_repository @-> returning string)
+
+    let git_repository_set_workdir =
+      foreign
+        "git_repository_set_workdir"
+        (ptr Types.git_repository @-> string @-> int @-> returning int)
+
+    let git_repository_is_bare =
+      foreign
+        "git_repository_is_bare"
+        (ptr Types.git_repository @-> returning int)
+
+    let git_repository_config =
+      foreign
+        "git_repository_config"
+        (ptr (ptr Types.git_config) @-> ptr Types.git_repository @-> returning int)
+
+    let git_repository_config_snapshot =
+      foreign
+        "git_repository_config_snapshot"
+        (ptr (ptr Types.git_config) @-> ptr Types.git_repository @-> returning int)
+
+    let git_repository_odb =
+      foreign
+        "git_repository_odb"
+        (ptr (ptr Types.git_odb) @-> ptr Types.git_repository @-> returning int)
+
+    let git_repository_refdb =
+      foreign
+        "git_repository_refdb"
+        (ptr (ptr Types.git_index) @-> ptr Types.git_repository @-> returning int)
+
+    let git_repository_index =
+      foreign
+        "git_repository_index"
+        (ptr (ptr Types.git_index) @-> ptr Types.git_repository @-> returning int)
+
+    let git_repository_message =
+      foreign
+        "git_repository_message"
+        (ptr Buffer.git_buf @-> ptr Types.git_repository @-> returning int)
+
+    let git_repository_message_remove =
+      foreign
+        "git_repository_message_remove"
+        (ptr Types.git_repository @-> returning int)
+
+    let git_repository_state_cleanup =
+      foreign
+        "git_repository_state_cleanup"
+        (ptr Types.git_repository @-> returning int)
+
+    let git_repository_fetchhead_foreach =
+      foreign
+        "git_repository_fetchhead_foreach"
+        (ptr Types.git_repository @->
+           funptr git_repository_fetchhead_foreach_cb @->
+             ptr void @-> returning int)
+
+    let git_repository_mergehead_foreach =
+      foreign
+        "git_repository_mergehead_foreach"
+        (ptr Types.git_repository @->
+           funptr git_repository_mergehead_foreach_cb @->
+             ptr void @-> returning int)
+
+    let git_repository_hashfile =
+      foreign
+        "git_repository_hashfile"
+        (ptr Oid.git_oid @->
+           ptr Types.git_repository @->
+             string @->
+               Types.git_otype @->
+                 string @-> returning int)
+
+    let git_repository_set_head =
+      foreign
+        "git_repository_set_head"
+        (ptr Types.git_repository @-> string @-> returning int)
+
+    let git_repository_set_head_detached =
+      foreign
+        "git_repository_set_head_detached"
+        (ptr Types.git_repository @-> ptr Oid.git_oid @-> returning int)
+
+    let git_repository_set_head_detached_from_annotated =
+      foreign
+        "git_repository_set_head_detached_from_annotated"
+        (ptr Types.git_repository @->
+           ptr Types.git_annotated_commit @->
+             returning int)
+
+    let git_repository_detach_head =
+      foreign
+        "git_repository_detach_head"
+        (ptr Types.git_repository @-> returning int)
+
+    let git_repository_state =
+      foreign
+        "git_repository_state"
+        (ptr Types.git_repository @-> returning int)
+
+    let git_repository_set_namespace =
+      foreign
+        "git_repository_set_namespace"
+        (ptr Types.git_repository @-> string @-> returning int)
+
+    let git_repository_get_namespace =
+      foreign
+        "git_repository_get_namespace"
+        (ptr Types.git_repository @-> returning string)
+
+    let git_repository_is_shallow =
+      foreign
+        "git_repository_is_shallow"
+        (ptr Types.git_repository @-> returning int)
+
+    let git_repository_ident =
+      foreign
+        "git_repository_ident"
+        (ptr string @-> ptr string @-> ptr Types.git_repository @-> returning int)
+
+    let git_repository_set_ident =
+      foreign
+        "git_repository_set_ident"
+        (ptr Types.git_repository @-> string @-> string @-> returning int)
+
+  end
+
 module Clone = struct
     type git_clone_options
 
@@ -407,7 +651,8 @@ module Clone = struct
               ptr void @-> returning int
 
     let git_repository_create_cb =
-      (ptr (ptr Types.git_repository) @-> string @-> int @-> ptr void @-> returning int)
+      (ptr (ptr Types.git_repository) @->
+         string @-> int @-> ptr void @-> returning int)
 
     let git_clone_options =
       typedef
@@ -482,8 +727,14 @@ module Attr = struct
 (*   Printf.sprintf "%d.%d.%d" (!@ major) (!@ minor) (!@ rev) |> print_endline; *)
 (*   let features_value = Common.git_libgit2_features () in *)
 (*   print_endline (string_of_int features_value) *)
+let prepare_git =
+  foreign "git_libgit2_init" (ptr void @-> returning void)
 
-(* let () = *)
-(*   let result =  *)
-(*   in *)
-(*   print_endline (string_of_int result) *)
+let () =
+  prepare_git null;
+  let a_repo = allocate_n ~count:1 (ptr Types.git_repository) in
+  let result = Repository.git_repository_init
+                 a_repo
+                 "./temp_directory"
+                 (Unsigned.UInt.of_int 0) in
+  print_endline (string_of_int result)

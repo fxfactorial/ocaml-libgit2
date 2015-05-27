@@ -10,4 +10,4 @@ git_test:
 	./$@
 
 clean:
-	rm -rf *.cmi *.cmt *.cmx *.cmo *.o git_test
+	rm -rf *.cmi *.cmt *.cmx *.cmo *.o git_test libgit_gen_*
