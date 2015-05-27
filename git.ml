@@ -640,6 +640,49 @@ module Repository = struct
 
   end
 
+module Annotated_commit = struct
+
+    let git_annotated_commit_from_ref =
+      foreign
+        "git_annotated_commit_from_ref"
+        (ptr (ptr Types.git_annotated_commit) @->
+           ptr Types.git_repository @->
+             ptr Types.git_reference @-> returning int)
+
+    let git_annotated_commit_from_fetchhead =
+      foreign
+        "git_annotated_commit_from_fetchhead"
+        (ptr (ptr Types.git_annotated_commit) @->
+           ptr Types.git_repository @->
+             string @->
+               string @->
+                 ptr Oid.git_oid @-> returning int)
+
+    let git_annotated_commit_lookup =
+      foreign
+        "git_annotated_commit_lookup"
+        (ptr (ptr Types.git_annotated_commit) @->
+           ptr Types.git_repository @->
+             ptr Oid.git_oid @-> returning int)
+
+    let git_annotated_commit_from_revspec =
+      foreign
+        "git_annotated_commit_from_revspec"
+        (ptr (ptr Types.git_annotated_commit) @->
+           ptr Types.git_repository @->
+             string @-> returning int)
+
+    let git_annotated_commit_id =
+      foreign
+        "git_annotated_commit_id"
+        (ptr Types.git_annotated_commit @-> returning (ptr Oid.git_oid))
+
+    let git_annotated_commit_free =
+      foreign
+        "git_annotated_commit_free"
+        (ptr Types.git_annotated_commit @-> returning void)
+  end
+
 module Clone = struct
     type git_clone_options
 
