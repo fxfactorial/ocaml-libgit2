@@ -912,6 +912,33 @@ module Blob = struct
         (ptr Types.git_blob @-> returning int)
   end
 
+module Global = struct
+    let git_libgit2_init =
+      foreign
+        "git_libgit2_init"
+        (void @-> returning int)
+
+    let git_libgit2_shutdown =
+      foreign
+        "git_libgit2_shutdown"
+        (void @-> returning int)
+  end
+
+(* Helper functions in OCaml *)
+let init () =
+  Global.git_libgit2_init ()
+
+let shutdown () =
+  Global.git_libgit2_shutdown ()
+
+(* let () = *)
+(*   prepare_git (); *)
+(*   let a_repo = allocate_n ~count:1 (ptr Types.git_repository) in *)
+(*   let result = Repository.git_repository_init *)
+(*                  a_repo *)
+(*                  "./temp_directory" *)
+(*                  (Unsigned.UInt.of_int 0) in *)
+(*   print_endline (string_of_int result) *)
 (* let () = *)
 (*   let major = allocate int 0 in *)
 (*   let minor = allocate int 0 in *)
@@ -920,14 +947,3 @@ module Blob = struct
 (*   Printf.sprintf "%d.%d.%d" (!@ major) (!@ minor) (!@ rev) |> print_endline; *)
 (*   let features_value = Common.git_libgit2_features () in *)
 (*   print_endline (string_of_int features_value) *)
-let prepare_git =
-  foreign "git_libgit2_init" (ptr void @-> returning void)
-
-let () =
-  prepare_git null;
-  let a_repo = allocate_n ~count:1 (ptr Types.git_repository) in
-  let result = Repository.git_repository_init
-                 a_repo
-                 "./temp_directory"
-                 (Unsigned.UInt.of_int 0) in
-  print_endline (string_of_int result)
