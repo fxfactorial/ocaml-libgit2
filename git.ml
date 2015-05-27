@@ -400,6 +400,69 @@ module Oid = struct
         (ptr git_oid_shorten @-> returning void)
 
   end
+module Blame = struct
+    type git_blame_options
+    type git_blame_hunk
+    type git_blame
+
+    let git_blame_flag_t = typedef int64_t "git_blame_flag_t"
+
+    let git_blame_options =
+      typedef
+        (structure "git_blame_options" : git_blame_options structure typ)
+        "git_blame_options"
+
+    let git_blame_hunk =
+      typedef
+        (structure "git_blame_hunk" : git_blame_hunk structure typ)
+        "git_blame_hunk"
+
+    let git_blame =
+      typedef
+        (structure "git_blame" : git_blame structure typ)
+        "git_blame"
+
+    let git_blame_init_options =
+      foreign
+        "git_blame_init_options"
+        (ptr git_blame_options @-> uint @-> returning int)
+
+    let git_blame_get_hunk_count =
+      foreign
+        "git_blame_get_hunk_count"
+        (ptr git_blame @-> returning uint32_t)
+
+    let git_blame_get_hunk_byindex =
+      foreign
+        "git_blame_get_hunk_byindex"
+        (ptr git_blame @-> uint32_t @-> returning (ptr git_blame_hunk))
+
+    let git_blame_get_hunk_byline =
+      foreign
+        "git_blame_get_hunk_byline"
+        (ptr git_blame @-> uint32_t @-> returning (ptr git_blame_hunk))
+
+    let git_blame_file =
+      foreign
+        "git_blame_file"
+        (ptr (ptr git_blame) @->
+           ptr Types.git_repository @->
+             string @->
+               ptr git_blame_options @-> returning int)
+
+    let git_blame_buffer =
+      foreign
+        "git_blame_buffer"
+        (ptr (ptr git_blame) @->
+           ptr git_blame @->
+             string @->
+               size_t @-> returning int)
+
+    let git_blame_free =
+      foreign
+        "git_blame_free"
+        (ptr git_blame @-> returning void)
+  end
 
 module Indexer = struct
 
