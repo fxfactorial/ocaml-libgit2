@@ -15,6 +15,31 @@ the `Ctypes` library.
 Since I work on OS X primarily, my first goal is to have this working
 transparently and cleanly on that platform first.
 
+I haven't submitted to opam yet, but this works right now for OS X
+users.
+
+    git clone --recursive https://github.com/fxfactorial/ocaml-libgit2
+    cd ocaml-libgit2
+    make install
+
+To do a sanity check of everything working, try the following.
+
+in *test.ml*
+
+    open Git
+    
+    let () =
+      init ();
+      "libgit's version is: " ^ git_library_version () |> print_endline
+
+&#x2026;and then compile that with 
+
+    ocamlfind ocamlopt -package ocaml-libgit2 -linkpkg test.ml -o SanityCheck
+    ./SanityCheck
+
+If all went well, no DLL errors, then congrats. This most likely means
+everything is correct. 
+
 # Documentation
 
 I'm trying to expose as much of the API as I can and the naming is 1-1

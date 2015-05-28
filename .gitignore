@@ -6,3 +6,7 @@ Git_test
 README.org
 git.cmo
 a.out
+scratch.cmi
+scratch.cmt
+scratch.cmx
+scratch.o
