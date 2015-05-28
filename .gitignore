@@ -4,3 +4,5 @@ git.o
 git.cmx
 Git_test
 README.org
+git.cmo
+a.out
