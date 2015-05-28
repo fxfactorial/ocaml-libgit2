@@ -1,0 +1,4 @@
+OCaml Ctypes based bindings to libgit2 along with some
+helper functions for common tasks. The helper functions
+let you focus on your business logic rather than dealing
+with Ctypes. 

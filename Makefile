@@ -10,8 +10,8 @@ native:libgit set_meta
 	-cclib `ocamlfind query ocaml-libgit2`/$(CCLIB) -linkpkg $(SRC) -o Git_test
 
 libgit:
-	@echo "Updating libgit2 itself"
-	git submodule update --remote
+	# @echo "Updating libgit2 itself"
+	# git submodule update --remote
 	ocamlfind install ocaml-libgit2 META
 # The trick is the ; since cd is done in a separate shell
 	cd `ocamlfind query ocaml-libgit2`; \
@@ -25,7 +25,7 @@ set_meta:
 	`ocamlfind query ocaml-libgit2`/META
 
 install:
-	ocamlfind install ocaml-libgit2 -add git.cmo git.cmi git.cmt git.o git.cmx
+	ocamlfind install ocaml-libgit2 -add  git.cmi git.cmt git.o git.cmx
 
 uninstall:
 	ocamlfind remove ocaml-libgit2
