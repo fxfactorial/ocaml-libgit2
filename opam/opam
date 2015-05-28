@@ -1,0 +1,17 @@
+opam-version: "1.2"
+name: "ocaml-libgit2"
+version: "0.1"
+maintainer: "Edgar Aroutiounian <edgar.factorial@gmail.com>"
+authors: "Edgar Aroutiounian <edgar.factorial@gmail.com>"
+homepage: "https://github.com/fxfactorial/ocaml-libgit2"
+bug-reports: "https://github.com/fxfactorial/ocaml-libgit2/issues"
+license: "GPL2"
+dev-repo: "https://github.com/fxfactorial/ocaml-libgit2.git"
+build: [
+  [make]
+]
+install: [make "install"]
+remove: ["ocamlfind" "remove" "ocaml-libgit2"]
+depends: [
+  "ocamlfind" {build}
+]
