@@ -1040,11 +1040,14 @@ module Results = struct
 
 open Results
 
+let git_cont i =
+  of_int i |> continue
+
 let init () =
-  Global.git_libgit2_init () |>  of_int |> continue
+  Global.git_libgit2_init () |> git_cont
 
 let shutdown () =
-  Global.git_libgit2_shutdown () |> of_int |> continue
+  Global.git_libgit2_shutdown () |> git_cont
 
 let init_repo ?(is_bare=true) ?init_options ~repo_path:repo_path =
   let a_repo = allocate_n ~count:1 (ptr Types.git_repository) in
@@ -1053,9 +1056,11 @@ let init_repo ?(is_bare=true) ?init_options ~repo_path:repo_path =
      Repository.git_repository_init
        a_repo
        repo_path
-       (if not is_bare then Unsigned.UInt.of_int 1 else Unsigned.UInt.of_int 0)
+       (if not is_bare then Unsigned.UInt.of_int 1 else Unsigned.UInt.of_int 0) |>
+       git_cont
   | Some git_options ->
-     Repository.git_repository_init_ext a_repo repo_path git_options
+     Repository.git_repository_init_ext a_repo repo_path git_options |>
+       git_cont
 
 let git_library_version () =
   let major = allocate_n ~count:1 int in
@@ -1073,11 +1078,11 @@ let clone_simple ?path ~repo_url:url =
              | None -> Filename.current_dir_name ^
                          (Uri.of_string url |> Uri.path |> Filename.dirname)) |>
       fun curried ->
-      curried (from_voidp Clone.git_clone_options null)
+      curried (from_voidp Clone.git_clone_options null) |> git_cont
 
 let find_repo ~path:p =
   let root = make Buffer.git_buf in
-  ignore(Repository.git_repository_discover (addr root) p 0 None);
+  Repository.git_repository_discover (addr root) p 0 None |> git_cont;
   let result = getf root Buffer.ptr_ in
   let length = getf root Buffer.size_ |> Unsigned.Size_t.to_int in
   string_from_ptr result length
