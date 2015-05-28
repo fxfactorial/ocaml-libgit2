@@ -25,13 +25,13 @@ users.
 To do a sanity check of everything working, try the following.
 
 in *test.ml*
-
-    open Git
+```ocaml
+open Git
     
-    let () =
-      init ();
-      "libgit's version is: " ^ git_library_version () |> print_endline
-
+let () =
+  init ();
+  "libgit's version is: " ^ git_library_version () |> print_endline
+```
 &#x2026;and then compile that with 
 
     ocamlfind ocamlopt -package ocaml-libgit2 -linkpkg test.ml -o SanityCheck
