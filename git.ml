@@ -25,10 +25,42 @@ module Common = struct
 
 module Buffer = struct
     type git_buf
+    let struc = structure ""
+    let ptr_ = field struc "ptr" (ptr char)
+    let size_ = field struc "size" size_t
+
     let git_buf =
+      let _ = field struc "asize" size_t in
+      let _ = field struc "size" size_t in
+      seal struc;
       typedef
-        (structure "git_buf" : git_buf structure typ)
+        (struc : git_buf structure typ)
         "git_buf"
+
+    let git_buf_free =
+      foreign
+        "git_buf_free"
+        (ptr git_buf @-> returning void)
+
+    let git_buf_grow =
+      foreign
+        "git_buf_grow"
+        (ptr git_buf @-> size_t @-> returning int)
+
+    let git_buf_set =
+      foreign
+        "git_buf_set"
+        (ptr git_buf @-> ptr void @-> size_t @-> returning int)
+
+    let git_buf_is_binary =
+      foreign
+        "git_buf_is_binary"
+        (ptr git_buf @-> returning int)
+
+    let git_buf_contains_nul =
+      foreign
+        "git_buf_contains_nul"
+        (ptr git_buf @-> returning int)
   end
 
 module Types = struct
@@ -81,9 +113,10 @@ module Types = struct
     let git_cert_t = typedef int64_t "git_cert_t"
     let git_otype = typedef int64_t "git_otype"
 
-    let git_odb = typedef
-                    (structure "git_odb" : git_odb structure typ)
-                    "git_odb"
+    let git_odb =
+      typedef
+        (structure "git_odb" : git_odb structure typ)
+        "git_odb"
 
     let git_odb_backend =
       typedef
@@ -513,7 +546,7 @@ module Repository = struct
     let git_repository_discover =
       foreign
         "git_repository_discover"
-        (ptr Buffer.git_buf @-> string @-> int @-> string @-> returning int)
+        (ptr Buffer.git_buf @-> string @-> int @-> string_opt @-> returning int)
 
     let git_repository_open_ext =
       foreign
@@ -958,3 +991,16 @@ let clone_simple ?path ~repo_url:url =
                          (Uri.of_string url |> Uri.path |> Filename.dirname)) |>
       fun curried ->
       curried (from_voidp Clone.git_clone_options null)
+
+let find_repo ~path:p =
+  let root = make Buffer.git_buf in
+  (* Will have to come back, check errors, Result.t? *)
+  ignore(Repository.git_repository_discover (addr root) p 0 None);
+  let result = getf root Buffer.ptr_ in
+  let length = getf root Buffer.size_ |> Unsigned.Size_t.to_int in
+  string_from_ptr result length
+
+(* let () = *)
+(*   init (); *)
+(*   find_repo "/Users/Edgar/Repos/" |> print_endline *)
+
