@@ -924,26 +924,37 @@ module Global = struct
         (void @-> returning int)
   end
 
-(* Helper functions in OCaml *)
 let init () =
   Global.git_libgit2_init ()
 
 let shutdown () =
   Global.git_libgit2_shutdown ()
 
-(* let () = *)
-(*   prepare_git (); *)
-(*   let a_repo = allocate_n ~count:1 (ptr Types.git_repository) in *)
-(*   let result = Repository.git_repository_init *)
-(*                  a_repo *)
-(*                  "./temp_directory" *)
-(*                  (Unsigned.UInt.of_int 0) in *)
-(*   print_endline (string_of_int result) *)
-(* let () = *)
-(*   let major = allocate int 0 in *)
-(*   let minor = allocate int 0 in *)
-(*   let rev = allocate int 0 in *)
-(*   Common.git_libgit2_version major minor rev; *)
-(*   Printf.sprintf "%d.%d.%d" (!@ major) (!@ minor) (!@ rev) |> print_endline; *)
-(*   let features_value = Common.git_libgit2_features () in *)
-(*   print_endline (string_of_int features_value) *)
+let init_repo ?(is_bare=true) ?init_options ~repo_path:repo_path =
+  let a_repo = allocate_n ~count:1 (ptr Types.git_repository) in
+  match init_options with
+  | None ->
+     Repository.git_repository_init
+       a_repo
+       repo_path
+       (if not is_bare then Unsigned.UInt.of_int 1 else Unsigned.UInt.of_int 0)
+  | Some git_options ->
+     Repository.git_repository_init_ext a_repo repo_path git_options
+
+let git_library_version () =
+  let major = allocate_n ~count:1 int in
+  let minor = allocate_n ~count:1 int in
+  let rev = allocate_n ~count:1 int in
+  Common.git_libgit2_version major minor rev;
+  Printf.sprintf "%d.%d.%d" (!@ major) (!@ minor) (!@ rev)
+
+let clone_simple ?path ~repo_url:url =
+  let a_repo = allocate_n ~count:1 (ptr Types.git_repository) in
+  Clone.git_clone a_repo url |>
+    fun curried ->
+    curried (match path with
+             | Some p -> p
+             | None -> Filename.current_dir_name ^
+                         (Uri.of_string url |> Uri.path |> Filename.dirname)) |>
+      fun curried ->
+      curried (from_voidp Clone.git_clone_options null)

@@ -1,4 +1,4 @@
-PACKAGES := ctypes.foreign
+PACKAGES := ctypes.foreign,uri
 CCLIB := libgit2.0.22.0.dylib
 SRC := git.ml
 
