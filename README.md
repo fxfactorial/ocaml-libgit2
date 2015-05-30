@@ -25,17 +25,21 @@ users.
 To do a sanity check of everything working, try the following.
 
 in *test.ml*
-```ocaml
-open Git
+
+    open Git
     
-let () =
-  init ();
-  "libgit's version is: " ^ git_library_version () |> print_endline
-```
+    let () =
+      init ();
+      "libgit's version is: " ^ git_library_version () |> print_endline
+
 &#x2026;and then compile that with 
 
     ocamlfind ocamlopt -package ocaml-libgit2 -linkpkg test.ml -o SanityCheck
     ./SanityCheck
+
+or if bytecode is your thing
+
+    ocamlfind ocamlc -custom -package ocaml-libgit2 test.ml -linkpkg -o SanityCheck
 
 If all went well, no DLL errors, then congrats. This most likely means
 everything is correct. 
