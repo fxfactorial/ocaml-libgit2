@@ -551,8 +551,8 @@ module Repository = struct
     let git_repository_open_ext =
       foreign
         "git_repository_open_ext"
-        ((ptr (ptr Types.git_repository)) @->
-           string @-> int @-> string @-> returning int)
+        ((ptr_opt (ptr Types.git_repository)) @->
+           string @-> int @-> string_opt @-> returning int)
 
     let git_repository_open_bare =
       foreign
@@ -1086,3 +1086,11 @@ let find_repo ~path:p =
   let result = getf root Buffer.ptr_ in
   let length = getf root Buffer.size_ |> Unsigned.Size_t.to_int in
   string_from_ptr result length
+
+let is_a_repo ~path:p =
+  try
+    Repository.git_repository_open_ext None p 0 None |> git_cont;
+    true
+  with
+    Git_Errored _ -> false
+

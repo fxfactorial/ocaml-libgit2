@@ -3,7 +3,7 @@ PACKAGES := ctypes.foreign,uri
 CCLIB := libgit2.0.22.0.dylib
 SRC := git.ml
 
-.PHONY: clean
+.PHONY: clean distclean uninstall
 
 all:install
 
@@ -12,8 +12,10 @@ native:libgit set_meta
 	-cclib `ocamlfind query ocaml-libgit2`/$(CCLIB) -linkpkg $(SRC)
 
 bytecode:libgit set_meta
-	ocamlfind ocamlc -package $(PACKAGES) \
-	-cclib `ocamlfind query ocaml-libgit2`/$(CCLIB) -linkpkg $(SRC)
+	# ocamlfind ocamlc -package $(PACKAGES) \
+	# -cclib `ocamlfind query ocaml-libgit2`/$(CCLIB) -linkpkg $(SRC)
+	ocamlfind ocamlc -custom -package ctypes.foreign,uri \
+	-linkpkg -cclib -L$(shell ocamlfind query ocaml-libgit2) -cclib -lgit2 git.ml
 
 libgit:
 	# Not sure why this doesn't work with opam yet.
@@ -22,7 +24,7 @@ libgit:
 	ocamlfind install ocaml-libgit2 META
 # The trick is the ; since cd is done in a separate shell
 	cd `ocamlfind query ocaml-libgit2`; \
-	cmake $(ROOT)/libgit2 -DBUILD_CLAR=OFF; \
+	cmake $(ROOT)/libgit2 -DBUILD_CLAR=OFF -DCMAKE_MACOSX_RPATH=. ;\
 	cmake --build .; \
 	find . -not -name "*.dylib" -not -name "META" -delete
 
@@ -33,6 +35,9 @@ set_meta:
 
 install:native bytecode
 	ocamlfind install ocaml-libgit2 -add  git.cmo git.cmi git.cmt git.o git.cmx
+
+distclean:clean uninstall
+
 uninstall:
 	ocamlfind remove ocaml-libgit2
 clean:
