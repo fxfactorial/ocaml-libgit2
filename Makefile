@@ -17,6 +17,8 @@ bytecode:libgit set_meta
 	ocamlfind ocamlc -custom -package ctypes.foreign,uri \
 	-linkpkg -cclib -L$(shell ocamlfind query ocaml-libgit2) -cclib -lgit2 $(SRC)
 
+libaries:native bytecode
+
 libgit:
 	# Not sure why this doesn't work with opam yet.
 	# @echo "Updating libgit2 itself"

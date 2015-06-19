@@ -1001,15 +1001,18 @@ module Results = struct
       | -30 ->  Git_error ("Internal only", code)
       | -31 ->  Git_error ("Signals end of iteration with iterator", code)
       | _ -> Git_payload ()
+
+    let result = fun code -> of_int code >>= fun _ -> Git_payload ()
+
   end
 
 open Results
 
 let init () =
-  Global.git_libgit2_init () |> of_int
+  Global.git_libgit2_init () |> result
 
 let shutdown () =
-  Global.git_libgit2_shutdown () |> of_int
+  Global.git_libgit2_shutdown () |> result
 
 let init_repo ?(is_bare=true) ?init_options ~repo_path:repo_path =
   let a_repo = allocate_n ~count:1 (ptr Types.git_repository) in
@@ -1020,7 +1023,7 @@ let init_repo ?(is_bare=true) ?init_options ~repo_path:repo_path =
         repo_path
         (if not is_bare then Unsigned.UInt.of_int 1 else Unsigned.UInt.of_int 0)
    | Some git_options ->
-      Repository.git_repository_init_ext a_repo repo_path git_options) |> of_int
+      Repository.git_repository_init_ext a_repo repo_path git_options) |> result
 
 let git_library_version () =
   let major = allocate_n ~count:1 int in
@@ -1038,7 +1041,7 @@ let clone_simple ?path ~repo_url:url =
              | None -> Filename.current_dir_name ^
                          (Uri.of_string url |> Uri.path |> Filename.dirname)) |>
       fun curried ->
-      curried (from_voidp Clone.git_clone_options null) |> of_int
+      curried (from_voidp Clone.git_clone_options null) |> result
 
 let find_repo path =
   let root = make Buffer.git_buf in
@@ -1048,4 +1051,4 @@ let find_repo path =
   Git_payload (string_from_ptr result length)
 
 let is_a_repo path =
-  Repository.git_repository_open_ext None path 0 None |> of_int
+  Repository.git_repository_open_ext None path 0 None |> result
