@@ -15,7 +15,7 @@ bytecode:libgit set_meta
 	# ocamlfind ocamlc -package $(PACKAGES) \
 	# -cclib `ocamlfind query ocaml-libgit2`/$(CCLIB) -linkpkg $(SRC)
 	ocamlfind ocamlc -custom -package ctypes.foreign,uri \
-	-linkpkg -cclib -L$(shell ocamlfind query ocaml-libgit2) -cclib -lgit2 git.ml
+	-linkpkg -cclib -L$(shell ocamlfind query ocaml-libgit2) -cclib -lgit2 $(SRC)
 
 libgit:
 	# Not sure why this doesn't work with opam yet.
