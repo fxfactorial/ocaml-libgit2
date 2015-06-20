@@ -89,6 +89,7 @@ module Types = struct
     type git_note
     type git_packbuilder
     type git_time
+    type git_time_t
     type git_signature
     type git_reference
     type git_reference_iterator
@@ -958,6 +959,146 @@ module Global = struct
         (void @-> returning int)
   end
 
+module Commit = struct
+
+    let git_commit_lookup =
+      foreign
+        "git_commit_lookup"
+        (ptr (ptr Types.git_commit) @->
+           ptr Types.git_repository @->
+             ptr Oid.git_oid @->
+               returning int)
+
+    let git_commit_lookup_prefix =
+      foreign
+        "git_commit_lookup_prefix"
+        (ptr (ptr Types.git_commit) @->
+           ptr Types.git_repository @->
+             ptr Oid.git_oid @->
+               size_t @->
+                 returning int)
+
+    let git_commit_id =
+      foreign
+        "git_commit_id"
+        (ptr Types.git_commit @-> returning (ptr Oid.git_oid))
+
+    let git_commit_owner =
+      foreign
+        "git_commit_owner"
+        (ptr Types.git_commit @-> returning (ptr Types.git_repository))
+
+    let git_commit_message_encoding =
+      foreign
+        "git_commit_message_encoding"
+        (ptr Types.git_commit @-> returning string_opt)
+
+    let git_commit_message =
+      foreign
+        "git_commit_message"
+        (ptr Types.git_commit @-> returning string)
+
+    let git_commit_message_raw =
+      foreign
+        "git_commit_message_raw"
+        (ptr Types.git_commit @-> returning string)
+
+    let git_commit_summary =
+      foreign
+        "git_commit_summary"
+        (ptr Types.git_commit @-> returning string_opt)
+
+    let git_commit_time =
+      foreign
+        "git_commit_time"
+        (ptr Types.git_commit @-> returning Types.git_time_t)
+
+    let git_commit_time_offset =
+      foreign
+        "git_commit_time_offset"
+        (ptr Types.git_commit @-> returning int)
+
+    let git_commit_committer =
+      foreign
+        "git_commit_committer"
+        (ptr Types.git_commit @-> returning (ptr Types.git_signature))
+
+    let git_commit_author =
+      foreign
+        "git_commit_author"
+        (ptr Types.git_commit @-> returning (ptr Types.git_signature))
+
+    let git_commit_raw_header =
+      foreign
+        "git_commit_raw_header"
+        (ptr Types.git_commit @-> returning string)
+
+    let git_commit_tree =
+      foreign
+        "git_commit_tree"
+        (ptr (ptr Types.git_tree) @-> ptr Types.git_commit @-> returning int)
+
+    let git_commit_tree_id =
+      foreign
+        "git_commit_tree_id"
+        (ptr Types.git_commit @-> returning (ptr Oid.git_oid))
+
+    let git_commit_parentcount =
+      foreign
+        "git_commit_parentcount"
+        (ptr Types.git_commit @-> returning uint)
+
+    let git_commit_parent =
+      foreign
+        "git_commit_parent"
+        (ptr (ptr Types.git_commit) @->
+           ptr Types.git_commit @->
+             uint @->
+               returning int)
+
+    let git_commit_parent_id =
+      foreign
+        "git_commit_parent_id"
+        (ptr Types.git_commit @-> uint @-> returning (ptr Oid.git_oid))
+
+    let git_commit_nth_gen_ancestor =
+      foreign
+        "git_commit_nth_gen_ancestor"
+        (ptr (ptr Types.git_commit) @->
+           ptr Types.git_commit @->
+             uint @->
+               returning int)
+
+    let git_commit_create =
+      foreign
+        "git_commit_create"
+        (ptr Oid.git_oid @->
+           ptr Types.git_repository @->
+             string @->
+               ptr Types.git_signature @->
+                 ptr Types.git_signature @->
+                   string @->
+                     string @->
+                       ptr Types.git_tree @->
+                         size_t @->
+                           ptr (ptr Types.git_commit) @->
+                             returning int)
+
+    let git_commit_amend =
+      foreign
+        "git_commit_amend"
+        (ptr Oid.git_oid @->
+           ptr Types.git_commit @->
+             string @->
+               ptr_opt Types.git_signature @->
+                 ptr_opt Types.git_signature @->
+                   string_opt @->
+                     string_opt @->
+                       ptr_opt Types.git_tree @->
+                         returning int)
+
+  end
+
 (** Now the helpers *)
 module Results = struct
 
@@ -1009,6 +1150,19 @@ module Results = struct
 
 open Results
 
+type commit = {oid: Oid.git_oid ptr;
+               encoding: String.t;
+               message: String.t;
+               summary: String.t;
+               time: Types.git_time_t;
+               offset_in_min : int;
+               committer_name:String.t;
+               committer_email:String.t;
+               author_name: String.t;
+               author_email:String.t;
+               header : String.t;
+               tree_id : Oid.git_oid ptr}
+
 let init () =
   Global.git_libgit2_init () |> result
 
@@ -1058,3 +1212,6 @@ let find_repo path =
 
 let is_a_repo path =
   Repository.git_repository_open_ext None path 0 None |> result
+
+(* let commit_info a_repo an_oid = *)
+
