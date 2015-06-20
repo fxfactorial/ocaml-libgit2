@@ -946,6 +946,7 @@ module Blob = struct
   end
 
 module Global = struct
+
     let git_libgit2_init =
       foreign
         "git_libgit2_init"
@@ -1021,9 +1022,12 @@ let init_repo ?(is_bare=true) ?init_options ~repo_path:repo_path =
       Repository.git_repository_init
         a_repo
         repo_path
-        (if not is_bare then Unsigned.UInt.of_int 1 else Unsigned.UInt.of_int 0)
+        (if not is_bare
+         then Unsigned.UInt.of_int 1
+         else Unsigned.UInt.of_int 0)
    | Some git_options ->
-      Repository.git_repository_init_ext a_repo repo_path git_options) |> result
+      Repository.git_repository_init_ext a_repo repo_path git_options) |>
+    result
 
 let git_library_version () =
   let major = allocate_n ~count:1 int in
@@ -1036,16 +1040,18 @@ let clone_simple ?path ~repo_url:url =
   let a_repo = allocate_n ~count:1 (ptr Types.git_repository) in
   Clone.git_clone a_repo url |>
     fun curried ->
-    curried (match path with
-             | Some p -> p
-             | None -> Filename.current_dir_name ^
-                         (Uri.of_string url |> Uri.path |> Filename.dirname)) |>
+    curried
+      (match path with
+       | Some p -> p
+       | None -> Filename.current_dir_name ^
+                   (Uri.of_string url |> Uri.path |> Filename.dirname)) |>
       fun curried ->
       curried (from_voidp Clone.git_clone_options null) |> result
 
 let find_repo path =
   let root = make Buffer.git_buf in
-  Repository.git_repository_discover (addr root) path 0 None |> of_int >>= fun _ ->
+  Repository.git_repository_discover (addr root) path 0 None |>
+    of_int >>= fun _ ->
   let result = getf root Buffer.ptr_ in
   let length = getf root Buffer.size_ |> Unsigned.Size_t.to_int in
   Git_payload (string_from_ptr result length)

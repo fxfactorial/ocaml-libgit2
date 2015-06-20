@@ -2,6 +2,8 @@ ROOT := $(shell pwd)
 PACKAGES := ctypes.foreign,uri
 CCLIB := libgit2.0.22.0.dylib
 SRC := git.ml
+TEST_EXEC := Test_executable
+TEST_SRC := test.ml
 
 .PHONY: clean distclean uninstall
 
@@ -15,7 +17,8 @@ bytecode:libgit set_meta
 	# ocamlfind ocamlc -package $(PACKAGES) \
 	# -cclib `ocamlfind query ocaml-libgit2`/$(CCLIB) -linkpkg $(SRC)
 	ocamlfind ocamlc -custom -package ctypes.foreign,uri \
-	-linkpkg -cclib -L$(shell ocamlfind query ocaml-libgit2) -cclib -lgit2 $(SRC)
+	-linkpkg -cclib -L$(shell ocamlfind query ocaml-libgit2) \
+	-cclib -lgit2 $(SRC)
 
 libaries:native bytecode
 
@@ -32,11 +35,18 @@ libgit:
 
 set_meta:
 #Need something better
-	echo "linkopts = \"-cclib" `ocamlfind query ocaml-libgit2`/$(CCLIB)"\"" >> \
+	echo \
+	"linkopts = \"-cclib" `ocamlfind query ocaml-libgit2`/$(CCLIB)"\"" >> \
 	`ocamlfind query ocaml-libgit2`/META
 
+tests:install
+	$(eval PACKAGES := oUnit,ocaml-libgit2)
+	ocamlfind ocamlopt $(TEST_SRC) -package \
+	$(PACKAGES) -linkpkg -o $(TEST_EXEC)
+	./$(TEST_EXEC)
+
 install:native bytecode
-	ocamlfind install ocaml-libgit2 -add  git.cmo git.cmi git.cmt git.o git.cmx
+	ocamlfind install ocaml-libgit2 -add git.*
 
 distclean:clean uninstall
 
